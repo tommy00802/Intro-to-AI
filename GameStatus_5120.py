@@ -55,6 +55,7 @@ class GameStatus:
         YOUR CODE HERE TO ADD ALL THE NON EMPTY CELLS TO MOVES VARIABLES AND RETURN IT TO BE USE BY YOUR
         MINIMAX OR NEGAMAX FUNCTIONS
         """
+		# note: i wrote the minimax function to use tuples, so moves should be a list of tuples. ex: [(1,2), (3,4)]
 		return moves
 
 
