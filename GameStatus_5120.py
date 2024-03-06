@@ -18,6 +18,19 @@ class GameStatus:
         YOUR CODE HERE TO CHECK IF ANY CELL IS EMPTY WITH THE VALUE 0. IF THERE IS NO EMPTY
         THEN YOU SHOULD ALSO RETURN THE WINNER OF THE GAME BY CHECKING THE SCORES FOR EACH PLAYER 
         """
+		cell = [j for i in self.board_state for j in i]
+
+		if 0 not in cell:
+			scores = self.get_scores(True)
+			if scores > 0:
+				self.winner = '0'
+			elif scores < 0:
+				self.winner = "X"
+			else:
+				self.winner = "Draw"
+			return True
+		return False
+			
 		
 
 	def get_scores(self, terminal):
@@ -33,7 +46,43 @@ class GameStatus:
 		cols = len(self.board_state[0])
 		scores = 0
 		check_point = 3 if terminal else 2
+
+		for i in range(rows):
+			for j in range(cols - check_point + 1):
+				line = i[j:j + check_point]
+				if all(cell == 1 for cell in line):
+					scores += 1
+				elif all(cell == -1 for cell in line):
+					scores -= 1
 		
+		for i in range(cols):
+			for j in range(rows - check_point + 1):
+				line = [self.board_state[r][i] for r in range(j, j + check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 1
+				elif all(cell == -1 for cell in line):
+					scores -= 1
+
+		for i in range(rows - check_point + 1):
+			for j in range(cols - check_point + 1):
+				line = [self.board_state[i + z][j + z] for z in range(check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 1
+				elif all(cell == -1 for cell in line):
+					scores -= 1
+
+		for i in range(check_point - 1, rows):
+			for j in range(cols - check_point + 1):
+				line = [self.board_state[i - z][j + z] for z in range(check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 1
+				elif all(cell == -1 for cell in line):
+					scores -= 1
+		
+		return scores
+		
+				
+	
 	    
 
 	def get_negamax_scores(self, terminal):
@@ -47,10 +96,44 @@ class GameStatus:
 		cols = len(self.board_state[0])
 		scores = 0
 		check_point = 3 if terminal else 2
+
+		for i in range(rows):
+			for j in range(cols - check_point + 1):
+				line = i[j:j + check_point]
+				if all(cell == 1 for cell in line):
+					scores += 100
+				elif all(cell == -1 for cell in line):
+					scores -= 100
+		
+		for i in range(cols):
+			for j in range(rows - check_point + 1):
+				line = [self.board_state[r][i] for r in range(j, j + check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 100
+				elif all(cell == -1 for cell in line):
+					scores -= 100
+
+		for i in range(rows - check_point + 1):
+			for j in range(cols - check_point + 1):
+				line = [self.board_state[i + z][j + z] for z in range(check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 100
+				elif all(cell == -1 for cell in line):
+					scores -= 100
+
+		for i in range(check_point - 1, rows):
+			for j in range(cols - check_point + 1):
+				line = [self.board_state[i - z][j + z] for z in range(check_point)]
+				if all(cell == 1 for cell in line):
+					scores += 100
+				elif all(cell == -1 for cell in line):
+					scores -= 100
+		
+		return scores
 	    
 
 	def get_moves(self):
-		moves = []
+		moves = [(x, y) for x in range(len(self.board_state)) for y in range(len(self.board_state[0])) if self.board_state[x][y] == 0]
 		"""
         YOUR CODE HERE TO ADD ALL THE NON EMPTY CELLS TO MOVES VARIABLES AND RETURN IT TO BE USE BY YOUR
         MINIMAX OR NEGAMAX FUNCTIONS
