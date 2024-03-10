@@ -14,6 +14,7 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  PLEASE CAREFULLY SEE THE PORTIONS OF THE CODE/FUNCTIONS WHERE IT INDICATES "YOUR CODE BELOW" TO COMPLETE THE SECTIONS
  
 """
+#import PySimpleGUI as sg
 import pygame
 import numpy as np
 from GameStatus_5120 import GameStatus
@@ -22,8 +23,38 @@ import sys, random
 
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
 
+width, height = 1000, 1000
+# screen = pygame.display.set_mode((width, height))
+
+class Button:
+    def __init__(self, text, position, size, bg_color, text_color, action=None):
+        self.text = text
+        self.position = position
+        self.size = size
+        self.bg_color = bg_color
+        self.text_color = text_color
+        self.action = action
+
+    def draw(self, screen):
+        font = pygame.font.Font(None, 32)
+        pygame.draw.rect(screen, self.bg_color, (self.position, self.size))
+        text_surface = font.render(self.text, True, self.text_color)
+        text_rect = text_surface.get_rect(center=self.position)
+        screen.blit(text_surface, text_rect)
+
+    def is_mouse_over(self, pos):
+        x, y = pos
+        return (self.position[0] <= x <= self.position[0] + self.size[0] and
+                self.position[1] <= y <= self.position[1] + self.size[1])
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.is_mouse_over(event.pos):
+                if self.action:
+                    self.action()
+
 class RandomBoardTicTacToe:
-    def __init__(self, size = (600, 600)):
+    def __init__(self, size = (500, 500)):
 
         self.size = self.width, self.height = size
         # Define some colors
@@ -46,9 +77,13 @@ class RandomBoardTicTacToe:
         # This sets the margin between each cell
         self.MARGIN = 5
 
+        self.button = Button("Click me", (300, 200), (200, 50), (0, 255, 0), (255, 255, 255), action=lambda: print("Button clicked"))
+
         # Initialize pygame
         pygame.init()
         self.game_reset()
+        
+
 
     def draw_game(self):
         # Create a 2 dimensional array using the column and row variables
@@ -61,8 +96,17 @@ class RandomBoardTicTacToe:
         """
         YOUR CODE HERE TO DRAW THE GRID OTHER CONTROLS AS PART OF THE GUI
         """
+
+        for row in range(self.GRID_SIZE):
+            for column in range(self.GRID_SIZE):
+                pygame.draw.rect(self.screen, self.WHITE,
+                                 [(self.MARGIN + self.WIDTH) * column + self.MARGIN,
+                                  (self.MARGIN + self.HEIGHT) * row + self.MARGIN,
+                                  self.WIDTH, self.HEIGHT])
         
+        self.button.draw(self.screen)
         pygame.display.update()
+        self.play_game()
 
     def change_turn(self):
 
@@ -75,14 +119,26 @@ class RandomBoardTicTacToe:
     def draw_circle(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CIRCLE FOR THE NOUGHTS PLAYER
+        
         """
+        color = (255, 0, 128)
+        center = (width // 2, height // 2)
+        radius = (100)
+
+        pygame.draw.circle(color, center, radius)
+        # screen, color, center, radius
         
 
-    def draw_cross(self, x, y):
+    def draw_cross(self, x, y, column, row):
         """
         YOUR CODE HERE TO DRAW THE CROSS FOR THE CROSS PLAYER AT THE CELL THAT IS SELECTED VIA THE gui
         """
-        
+        x_pos = (self.MARGIN + self.WIDTH) * column + self.MARGIN
+        y_pos = (self.MARGIN + self.HEIGHT) * row + self.MARGIN
+
+        pygame.draw.line(self.screen, self.RED, (x_pos, y_pos), (x_pos + self.WIDTH, y_pos + self.HEIGHT), 5)
+        pygame.draw.line(self.screen, self.RED, (x_pos, y_pos + self.HEIGHT), (x_pos + self.WIDTH, y_pos), 5)
+
 
     def is_game_over(self):
 
@@ -92,6 +148,7 @@ class RandomBoardTicTacToe:
         
         YOUR RETURN VALUE SHOULD BE TRUE OR FALSE TO BE USED IN OTHER PARTS OF THE GAME
         """
+        return GameStatus.is_terminal()
     
 
     def move(self, move):
@@ -107,10 +164,14 @@ class RandomBoardTicTacToe:
         THE RETURN VALUES FROM YOUR MINIMAX/NEGAMAX ALGORITHM SHOULD BE THE SCORE, MOVE WHERE SCORE IS AN INTEGER
         NUMBER AND MOVE IS AN X,Y LOCATION RETURNED BY THE AGENT
         """
+        minimax(GameStatus, 10, True)
+        negamax(GameStatus, 10, 1)
+
         
         self.change_turn()
         pygame.display.update()
         terminal = self.game_state.is_terminal()
+        self.game_state.get_scores(terminal)
         """ USE self.game_state.get_scores(terminal) HERE TO COMPUTE AND DISPLAY THE FINAL SCORES """
 
 
@@ -157,6 +218,10 @@ class RandomBoardTicTacToe:
                     # If it is human vs human then your opponent should have the value of the selected cell set to -1
                     # Then draw the symbol for your opponent in the selected cell
                     # Within this code portion, continue checking if the game has ended by using is_terminal function
+                if event.type == pygame.QUIT:
+                    # running = False
+                    done = True
+                self.button.handle_event(event)
                     
             # Update the screen with what was drawn.
             pygame.display.update()
@@ -170,3 +235,14 @@ AFTER THE ABOVE LINE, THE USER SHOULD SELECT THE OPTIONS AND START THE GAME.
 YOUR FUNCTION PLAY_GAME SHOULD THEN BE CALLED WITH THE RIGHT OPTIONS AS SOON
 AS THE USER STARTS THE GAME
 """
+
+
+                    
+#button = Button("Click me", (300, 200), (200, 50), (0, 255, 0), (255, 255, 255), action=lambda: print("Button clicked"))
+
+# running = True
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#         button.handle_event(event)
