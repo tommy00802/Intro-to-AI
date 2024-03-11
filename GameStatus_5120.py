@@ -49,7 +49,7 @@ class GameStatus:
 
 		for i in range(rows):
 			for j in range(cols - check_point + 1):
-				line = i[j:j + check_point]
+				line = self.board_state[i][j:j + check_point]
 				if all(cell == 1 for cell in line):
 					scores += 1
 				elif all(cell == -1 for cell in line):
@@ -80,10 +80,6 @@ class GameStatus:
 					scores -= 1
 		
 		return scores
-		
-				
-	
-	    
 
 	def get_negamax_scores(self, terminal):
 		"""
@@ -99,7 +95,7 @@ class GameStatus:
 
 		for i in range(rows):
 			for j in range(cols - check_point + 1):
-				line = i[j:j + check_point]
+				line = self.board_state[i][j:j + check_point]
 				if all(cell == 1 for cell in line):
 					scores += 100
 				elif all(cell == -1 for cell in line):
@@ -145,5 +141,5 @@ class GameStatus:
 	def get_new_state(self, move):
 		new_board_state = self.board_state.copy()
 		x, y = move[0], move[1]
-		new_board_state[x,y] = 1 if self.turn_O else -1
+		new_board_state[x][y] = 1 if self.turn_O else -1
 		return GameStatus(new_board_state, not self.turn_O)

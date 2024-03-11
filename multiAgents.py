@@ -5,6 +5,7 @@ def minimax(game_state: GameStatus, depth: int, maximizingPlayer: bool, alpha=fl
     terminal = game_state.is_terminal()
     if (depth==0) or (terminal):
         newScores = game_state.get_scores(terminal)
+        print(newScores)
         return newScores, None
 
     """
@@ -28,19 +29,23 @@ def _max(game_state: GameStatus, depth: int, alpha: float, beta: float):
     terminal = game_state.is_terminal()
     if (depth==0) or (terminal):
         newScores = game_state.get_scores(terminal)
+        # print(newScores)
         return newScores, None
     
     v = float('-inf')
     move = None
     for a in game_state.get_moves():
         # pretend to make move "a"
-        v2, a2 = _min(game_state.get_new_state(a), depth - 1)
+        v2, a2 = _min(game_state.get_new_state(a), depth - 1, alpha, beta)
+        # print(v2)
         if (v2 > v):
+            v = v2
             move = a
         # alpha/beta pruning
-        v = max(v, v2, alpha, beta)
-        if v >= beta: return v, a
+        # v = max(v, v2, alpha, beta)
+        # if v >= beta: return v, a
         alpha = max(alpha, v)
+        if alpha >= beta: break
     return v, move
 
 # helper function for minimax to find the min value
@@ -54,20 +59,23 @@ def _min(game_state: GameStatus, depth: int, alpha: float, beta: float):
     move = None
     for a in game_state.get_moves():
         # pretend to make move "a"
-        v2, a2 = _max(game_state.get_new_state(a), depth - 1)
+        v2, a2 = _max(game_state.get_new_state(a), depth - 1, alpha, beta)
+        # print(v2)
         if (v2 < v):
+            v = v2
             move = a
         # alpha/beta pruning
-        v = min(v, v2, alpha, beta)
-        if v <= alpha: return v, a
+        # v = min(v, v2, alpha, beta)
+        # if v <= alpha: return v, a
         beta = min(beta, v)
+        if alpha >= beta: break
     return v, move
 
 def negamax(game_status: GameStatus, depth: int, turn_multiplier: int, alpha=float('-inf'), beta=float('inf')):
     terminal = game_status.is_terminal()
     if (depth==0) or (terminal):
         scores = game_status.get_negamax_scores(terminal)
-        return scores, None
+        return scores * turn_multiplier, None
 
     """
     YOUR CODE HERE TO CALL NEGAMAX FUNCTION. REMEMBER THE RETURN OF THE NEGAMAX SHOULD BE THE OPPOSITE OF THE CALLING
@@ -85,10 +93,19 @@ def negamax(game_status: GameStatus, depth: int, turn_multiplier: int, alpha=flo
     v = float('-inf')
     move = None
     for a in game_status.get_moves():
-        v = max(v, -negamax(game_status.get_new_state(a), depth - 1, -turn_multiplier, -beta, -alpha))
+        v = max(v, -negamax(game_status.get_new_state(a), depth - 1, -turn_multiplier, -beta, -alpha)[0])
         alpha = max(alpha, v)
         if alpha >= beta: break
         move = a
+        # value, _ = negamax(game_status.get_new_state(a), depth - 1, -turn_multiplier, -beta, -alpha)
+        # value *= turn_multiplier # negate value for opponent
+        # print(value)
+
+        # if value > v:
+        #     move = a
+        # alpha = max(alpha, value)
+        # if alpha >= beta:
+        #     break # beta cutoff
     return v, move
 
     #return value, best_move
